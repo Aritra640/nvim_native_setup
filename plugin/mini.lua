@@ -3,6 +3,7 @@ require('mini.ai').setup()
 require('mini.surround').setup()
 require('mini.basics').setup()
 require('mini.icons').setup()
+require('mini.pairs').setup()
 
 --mini.pick
 require("mini.pick").setup({
@@ -78,67 +79,63 @@ end, { desc = "Workspace symbols" })
 
 
 
--- mini.statusline
-require("mini.statusline").setup({
-  content = {
-    active = function()
-      local MiniStatusline = require("mini.statusline")
-      local devicons = require("nvim-web-devicons")
 
-      -- 🔹 Filename + icon
-      local filename = vim.fn.expand("%:t")
-      if filename == "" then filename = "[No Name]" end
 
-      local icon, icon_hl = devicons.get_icon(filename, nil, { default = true })
+-- mini.completions 
+require("mini.completion").setup({
+  -- Auto completion
+  delay = { completion = 100, info = 200, signature = 200 },
 
-      -- 🔹 LSP
-      local clients = vim.lsp.get_clients({ bufnr = 0 })
-      local lsp = ""
-      if clients and #clients > 0 then
-        lsp = " " .. table.concat(vim.tbl_map(function(c)
-          return c.name
-        end, clients), ",")
-      end
-
-      -- 🔹 Sections
-      local mode = MiniStatusline.section_mode({ trunc_width = 120 })
-      local git = MiniStatusline.section_git({ trunc_width = 40 }) or ""
-      local diag = MiniStatusline.section_diagnostics({ trunc_width = 75 }) or ""
-
-      return table.concat({
-        -- Mode
-        "%#SLMode#  " .. mode .. " ",
-
-        -- File (icon + name)
-        "%#SLFile# ",
-        (icon_hl and "%#" .. icon_hl .. "#" .. icon .. " " or ""),
-        filename .. " ",
-
-        "%#SLDim#│",
-
-        -- Git + diagnostics
-        "%#SLGit# " .. git,
-        "%#SLDiag# " .. diag,
-
-        "%=",
-
-        -- LSP
-        "%#SLLsp# " .. lsp .. " ",
-
-        "%#SLDim#│ %l:%c ",
-      })
-    end,
+  -- Window configuration
+  window = {
+    info = { border = "rounded" },
+    signature = { border = "rounded" },
   },
+
+  -- LSP completion behavior
+  lsp_completion = {
+    source_func = "completefunc", -- use built-in completion
+    auto_setup = true,
+  },
+
+  -- Fallback action if no completion
+  fallback_action = "<C-n>",
 })
 
-vim.api.nvim_set_hl(0, "SLMode", { fg = "#0b0f14", bg = "#7aa2f7", bold = true })
-vim.api.nvim_set_hl(0, "SLFile", { fg = "#e5e9f0", bg = "#2e3440", bold = true })
+-- Better completion UX
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
+vim.opt.shortmess:append("c")
 
-vim.api.nvim_set_hl(0, "SLGit", { fg = "#98c379", bg = "NONE" })
-vim.api.nvim_set_hl(0, "SLDiag", { fg = "#e06c75", bg = "NONE" })
-vim.api.nvim_set_hl(0, "SLLsp", { fg = "#e5c07b", bg = "NONE" })
+-- 🔑 Keymaps (clean + intuitive)
 
-vim.api.nvim_set_hl(0, "SLDim", { fg = "#5c6370", bg = "NONE" })
+-- Navigate completion
+vim.keymap.set("i", "<C-n>", function()
+  return vim.fn.pumvisible() == 1 and "<C-n>" or "<Down>"
+end, { expr = true })
+
+vim.keymap.set("i", "<C-p>", function()
+  return vim.fn.pumvisible() == 1 and "<C-p>" or "<Up>"
+end, { expr = true })
+
+-- Confirm selection
+vim.keymap.set("i", "<CR>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<C-y>"
+  end
+  return "<CR>"
+end, { expr = true })
+
+-- Manual trigger (optional)
+vim.keymap.set("i", "<C-Space>", function()
+  vim.lsp.completion.get()
+end, { desc = "Trigger completion" })
+
+-- Close completion cleanly
+vim.keymap.set("i", "<Esc>", function()
+  return vim.fn.pumvisible() == 1 and "<C-e><Esc>" or "<Esc>"
+end, { expr = true })
+
+
 
 
 
