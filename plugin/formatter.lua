@@ -4,9 +4,7 @@ vim.pack.add({
 })
 
 -- ⚙️ Setup
-local conform = require("conform")
-
-conform.setup({
+require('conform').setup({
 	formatters_by_ft = {
 		-- Web stack
 		javascript = { "prettier" },
@@ -31,7 +29,7 @@ conform.setup({
 
 -- 🔑 Manual format keymap
 vim.keymap.set({ "n", "v" }, "<leader>mp", function()
-	conform.format({
+	require('conform').format({
 		lsp_fallback = true,
 		async = false,
 		timeout_ms = 1000,
