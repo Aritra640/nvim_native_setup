@@ -1,12 +1,20 @@
--- 📦 Install plugin
+-- =========================
+-- PLUGIN
+-- =========================
 vim.pack.add({
 	{ src = "https://github.com/stevearc/conform.nvim" },
 })
 
--- ⚙️ Setup
-require('conform').setup({
+-- REQUIRED for vim.pack
+vim.cmd("packadd conform.nvim")
+
+-- =========================
+-- SETUP
+-- =========================
+require("conform").setup({
+	log_level = vim.log.levels.ERROR, -- change to DEBUG if needed
+
 	formatters_by_ft = {
-		-- Web stack
 		javascript = { "prettier" },
 		typescript = { "prettier" },
 		javascriptreact = { "prettier" },
@@ -17,21 +25,20 @@ require('conform').setup({
 		json = { "prettier" },
 		yaml = { "prettier" },
 		markdown = { "prettier" },
-
-		-- 🔥 Prisma (added)
 		prisma = { "prettier" },
 
-		-- Other languages
 		lua = { "stylua" },
 		cpp = { "clang-format" },
 	},
 })
 
--- 🔑 Manual format keymap
+-- =========================
+-- KEYMAP
+-- =========================
 vim.keymap.set({ "n", "v" }, "<leader>mp", function()
-	require('conform').format({
+	require("conform").format({
 		lsp_fallback = true,
 		async = false,
-		timeout_ms = 1000,
+		timeout_ms = 2000,
 	})
 end, { desc = "Format file or range" })

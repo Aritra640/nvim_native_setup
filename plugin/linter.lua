@@ -1,24 +1,36 @@
--- Install nvim-lint using vim.pack
+-- =========================
+-- PLUGIN
+-- =========================
 vim.pack.add({
   { src = "https://github.com/mfussenegger/nvim-lint" },
 })
 
--- Safely require
+-- REQUIRED for vim.pack
+vim.cmd("packadd nvim-lint")
+
+-- =========================
+-- REQUIRE
+-- =========================
 local ok, lint = pcall(require, "lint")
 if not ok then
   return
 end
 
--- Configure linters per filetype
+-- =========================
+-- LINTERS
+-- =========================
 lint.linters_by_ft = {
-  rust = { "clippy" },         -- uses cargo clippy
-  javascript = { "eslint_d" }, -- faster eslint
+  rust = { "clippy" },
+
+  javascript = { "eslint_d" },
+  typescript = { "eslint_d" },
+  javascriptreact = { "eslint_d" },
+  typescriptreact = { "eslint_d" },
 }
 
--- Optional: fallback if eslint_d not available
--- lint.linters_by_ft.javascript = { "eslint" }
-
--- Auto trigger linting
+-- =========================
+-- AUTOCMD
+-- =========================
 local lint_augroup = vim.api.nvim_create_augroup("linting", { clear = true })
 
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
@@ -28,7 +40,9 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
   end,
 })
 
--- Optional keymap to manually trigger lint
+-- =========================
+-- KEYMAP
+-- =========================
 vim.keymap.set("n", "<leader>ml", function()
   lint.try_lint()
 end, { desc = "Trigger linting" })
