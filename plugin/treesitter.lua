@@ -7,9 +7,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
     local kind = ev.data.kind
 
     if spec and spec.src and spec.src:match("nvim%-treesitter") and kind == "update" then
-      if not ev.data.active then
-        vim.cmd("packadd nvim-treesitter")
-      end
+      vim.cmd("packadd nvim-treesitter")
       vim.cmd("TSUpdate")
     end
   end,
@@ -22,6 +20,7 @@ vim.pack.add({
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
+  { src = "https://github.com/windwp/nvim-ts-autotag" }, -- 🔥 FIX
 })
 
 -- =========================
@@ -30,6 +29,7 @@ vim.pack.add({
 vim.cmd("packadd nvim-treesitter")
 vim.cmd("packadd nvim-treesitter-textobjects")
 vim.cmd("packadd nvim-treesitter-context")
+vim.cmd("packadd nvim-ts-autotag") -- 🔥 FIX
 
 -- =========================
 -- SETUP
@@ -46,6 +46,8 @@ configs.setup({
     "javascript",
     "typescript",
     "tsx",
+    "html",       -- 🔥 REQUIRED for JSX/autotag
+    "css",        -- 🔥 useful for web
     "rust",
     "c",
     "cpp",
@@ -106,18 +108,27 @@ configs.setup({
       },
     },
   },
+
+  -- =========================
+  -- AUTOTAG (FIXED)
+  -- =========================
+  autotag = {
+    enable = true,
+  },
 })
 
 -- =========================
 -- CONTEXT (Sticky header)
 -- =========================
-require("treesitter-context").setup({
-  enable = true,
-  max_lines = 3,
-  trim_scope = "outer",
-})
+pcall(function()
+  require("treesitter-context").setup({
+    enable = true,
+    max_lines = 3,
+    trim_scope = "outer",
+  })
+end)
 
 -- =========================
--- BUILT-IN INSPECT (replaces playground)
+-- INSPECT TREE
 -- =========================
 vim.keymap.set("n", "<leader>ti", "<cmd>InspectTree<cr>", { desc = "Treesitter Inspect" })

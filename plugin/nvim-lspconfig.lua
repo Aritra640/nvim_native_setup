@@ -1,95 +1,129 @@
--- 📦 Install plugin
+-- =========================
+-- PLUGIN
+-- =========================
 vim.pack.add({
-	{ src = "https://github.com/neovim/nvim-lspconfig" },
+  { src = "https://github.com/neovim/nvim-lspconfig" },
 })
 
--- ⚙️ Enable LSPs
+-- REQUIRED for vim.pack
+vim.cmd("packadd nvim-lspconfig")
+
+-- =========================
+-- CMP CAPABILITIES (IMPORTANT)
+-- =========================
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+-- if cmp exists, enhance capabilities
+local ok_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+if ok_cmp then
+  capabilities = cmp_lsp.default_capabilities(capabilities)
+end
+
+-- =========================
+-- ENABLE LSPS
+-- =========================
 vim.lsp.enable({
-	"lua_ls",
-	"rust_analyzer",
-	"tsserver",
-	"html",
-	"cssls",
-	"prismals",
+  "lua_ls",
+  "rust_analyzer",
+  "tsserver",
+  "html",
+  "cssls",
+  "prismals",
 })
 
--- 🔧 Lua LSP fix (Neovim globals)
+-- =========================
+-- LSP CONFIGS
+-- =========================
+
+-- Lua
 vim.lsp.config("lua_ls", {
-	settings = {
-		Lua = {
-			diagnostics = {
-				globals = { "vim" },
-			},
-			workspace = {
-				checkThirdParty = false,
-			},
-		},
-	},
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = { "vim" },
+      },
+      workspace = {
+        checkThirdParty = false,
+      },
+    },
+  },
 })
 
--- 🔧 tsserver root fix (important for projects)
+-- TypeScript
 vim.lsp.config("tsserver", {
-	root_markers = { "package.json", "tsconfig.json", ".git" },
+  capabilities = capabilities,
+  root_markers = { "package.json", "tsconfig.json", ".git" },
 })
 
--- 🔧 Prisma (safe fallback)
+-- Rust
+vim.lsp.config("rust_analyzer", {
+  capabilities = capabilities,
+})
+
+-- HTML
+vim.lsp.config("html", {
+  capabilities = capabilities,
+})
+
+-- CSS
+vim.lsp.config("cssls", {
+  capabilities = capabilities,
+})
+
+-- Prisma
 vim.lsp.config("prismals", {
-	filetypes = { "prisma" },
+  capabilities = capabilities,
+  filetypes = { "prisma" },
 })
 
--- 🎯 Diagnostics UI (clean + modern)
+-- =========================
+-- DIAGNOSTICS UI
+-- =========================
 vim.diagnostic.config({
-	virtual_text = {
-		spacing = 2,
-		prefix = "●",
-	},
-	float = {
-		border = "rounded",
-	},
-	signs = true,
-	underline = true,
-	update_in_insert = false,
+  virtual_text = {
+    spacing = 2,
+    prefix = "●",
+  },
+  float = {
+    border = "rounded",
+  },
+  signs = true,
+  underline = true,
+  update_in_insert = false,
 })
 
--- Optional: show diagnostics on hover
+-- =========================
+-- HOVER DIAGNOSTICS
+-- =========================
 vim.api.nvim_create_autocmd("CursorHold", {
-	callback = function()
-		vim.diagnostic.open_float(nil, { focus = false })
-	end,
+  callback = function()
+    vim.diagnostic.open_float(nil, { focus = false })
+  end,
 })
 
--- 🧠 LSP keymaps (buffer-local, only when attached)
+-- =========================
+-- ON ATTACH KEYMAPS
+-- =========================
 vim.api.nvim_create_autocmd("LspAttach", {
-	callback = function(args)
-		local opts = { buffer = args.buf }
+  callback = function(args)
+    local opts = { buffer = args.buf }
 
-		-- Navigation
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+    -- Navigation
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 
-		-- Info
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    -- Info
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 
-		-- Actions
-		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-		vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-
-		-- -- ✅ Manual format (your preference)
-		-- vim.keymap.set("n", "<leader>mp", function()
-		-- 	vim.lsp.buf.format({ async = true })
-		-- end, { desc = "default format code" })
-	end,
+    -- Actions
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+  end,
 })
 
--- 🔧 Completion behavior (built-in)
+-- =========================
+-- COMPLETEOPT (CMP)
+-- =========================
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
-
-
--- restrict tsserver from hitting conflicts
-vim.lsp.buf.format({
-	async = true,
-	filter = function(client)
-		return client.name ~= "tsserver"
-	end,
-})
