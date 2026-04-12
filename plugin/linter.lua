@@ -6,13 +6,14 @@ vim.pack.add({
 })
 
 -- REQUIRED for vim.pack
-vim.cmd("packadd nvim-lint")
+-- vim.cmd("packadd nvim-lint")
 
 -- =========================
 -- REQUIRE
 -- =========================
 local ok, lint = pcall(require, "lint")
 if not ok then
+  vim.notify("nvim-lint not loaded", vim.log.levels.ERROR)
   return
 end
 

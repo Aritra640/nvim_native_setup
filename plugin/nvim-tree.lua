@@ -1,66 +1,87 @@
--- 📦 Install plugins
+-- =========================
+-- 📦 INSTALL
+-- =========================
 vim.pack.add({
   { src = "https://github.com/nvim-tree/nvim-tree.lua" },
   { src = "https://github.com/nvim-tree/nvim-web-devicons" },
 })
 
--- 🚫 Disable netrw (MUST be before setup)
+-- =========================
+-- 🚫 DISABLE NETRW (EARLY)
+-- =========================
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- ⚙️ Setup nvim-tree
-require("nvim-tree").setup({
-  view = {
-    width = 36,
-    relativenumber = true,
-    preserve_window_proportions = true,
-  },
-
-  renderer = {
-    indent_markers = {
-      enable = true,
+-- =========================
+-- ⚙️ SETUP (DEFERRED LIKE LAZY)
+-- =========================
+vim.schedule(function()
+  require("nvim-tree").setup({
+    view = {
+      width = 36,
+      relativenumber = false,
     },
-    icons = {
-      glyphs = {
-        folder = {
-          arrow_closed = "",
-          arrow_open = "",
+
+    renderer = {
+      indent_markers = {
+        enable = true,
+      },
+      icons = {
+        glyphs = {
+          folder = {
+            arrow_closed = "",
+            arrow_open = "",
+          },
         },
       },
     },
-  },
 
-  actions = {
-    open_file = {
-      window_picker = {
-        enable = false,
+    actions = {
+      open_file = {
+        window_picker = {
+          enable = false,
+        },
       },
-      resize_window = false, -- 🔥 prevents width glitches
     },
-  },
 
-  tab = {
-    sync = {
-      open = true,
-      close = true,
+    update_focused_file = {
+      enable = true,
+      update_root = false,
     },
-  },
 
-  update_focused_file = {
-    enable = true,
-    update_root = false,
-  },
+    filters = {
+      custom = { ".DS_Store" },
+    },
 
-  filters = {
-    custom = { ".DS_Store" },
-  },
+    git = {
+      ignore = false,
+    },
+  })
+end)
 
-  git = {
-    ignore = false,
-  },
+-- =========================
+-- 🔒 HARD LOCK WINDOW (REAL FIX)
+-- =========================
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "NvimTree",
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.signcolumn = "no"
+    vim.opt_local.foldcolumn = "0"
+    vim.opt_local.winfixwidth = true -- 🔥 prevents ALL resizing
+  end,
 })
 
--- 🔑 Keymaps
+-- =========================
+-- ⚠️ GLOBAL WINDOW SAFETY
+-- =========================
+vim.opt.equalalways = false
+-- vim.opt.winminwidth = 36
+
+-- =========================
+-- 🔑 KEYMAPS
+-- =========================
 vim.keymap.set("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle explorer" })
 vim.keymap.set("n", "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>", { desc = "Find file" })
 vim.keymap.set("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse tree" })
