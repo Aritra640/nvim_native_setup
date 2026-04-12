@@ -34,8 +34,8 @@ opt.swapfile = false
 
 opt.splitright = true
 opt.splitbelow = true
-opt.splitkeep = "screen"     -- 🔥 FIXES YOUR ORIGINAL ISSUE
-opt.equalalways = true      -- 🔥 prevents forced resizing
+opt.splitkeep = "screen"
+opt.equalalways = true
 vim.g.mapleader = " "
 
 -- Keymaps
@@ -68,3 +68,5 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>")
 
 -- insert fix
 keymap.set("i", "<C-e>", "<Esc>la", { desc = "Exit pair" })
+
+

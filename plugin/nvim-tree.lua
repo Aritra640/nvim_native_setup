@@ -19,7 +19,7 @@ vim.schedule(function()
   require("nvim-tree").setup({
     view = {
       width = 36,
-      relativenumber = false,
+      relativenumber = true,
     },
 
     renderer = {
