@@ -1,7 +1,9 @@
+vim.pack.add({
+	{ src = "https://github.com/neovim/nvim-lspconfig" },
+	{ src =  "https://github.com/nvim-mini/mini.nvim" },
+})
 
-vim.pack.add({ 'https://github.com/nvim-mini/mini.nvim' })
 require("mini.basics").setup()
-
 
 vim.cmd("let g:netrw_liststyle = 3")
 
@@ -68,5 +70,3 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>")
 
 -- insert fix
 keymap.set("i", "<C-e>", "<Esc>la", { desc = "Exit pair" })
-
-
